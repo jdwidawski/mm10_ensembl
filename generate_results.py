@@ -9,7 +9,6 @@ Source:
 
 
 """
-
 import pandas as pd
 
 class process_file():
@@ -28,10 +27,10 @@ class process_file():
         big_list = []
         for line in input_list:
             start, end = self.get_positions(line)
-            ensembl_id = self.get_ensembl_id(line)
+            ensembl_id, base_ensembl_id = self.get_ensembl_id(line)
             gene_name = self.get_locus_tag(line)
             note = self.get_note(line)
-            big_list.append([ensembl_id, gene_name, start, end, note])
+            big_list.append([base_ensembl_id, ensembl_id, gene_name, start, end, note])
 
         temp_dataframe = self.make_dataframe(big_list)
 
@@ -55,8 +54,16 @@ class process_file():
 
         if len(ensembl_str) == 0:
             ensembl_str = "n/a"
+            base_ensembl_str = ensembl_str
+        else:
+            if "." in ensembl_str:
+                base_ensembl_str = ensembl_str.split(".")[0]
+            else:
+                base_ensembl_str = ensembl_str
 
-        return ensembl_str
+
+
+        return ensembl_str, base_ensembl_str
 
     def get_locus_tag(self,line):
         locus_str = line.split('/locus_tag="')[1].split('"')[0].strip()
@@ -87,7 +94,7 @@ class process_file():
     def make_dataframe(self, big_list):
 
         ensembl_df = pd.DataFrame(big_list)
-        ensembl_df.columns = ["ensembl_id", "gene_name", "start", "end", "note"]
+        ensembl_df.columns = ["base_ensembl_id", "full_ensembl_id", "gene_name", "start", "end", "note"]
 
         if self.chr_id == "nonchromosomal":
             ensembl_df.insert(0, "chr", [self.chr_id for x in range(0,len(ensembl_df))])
