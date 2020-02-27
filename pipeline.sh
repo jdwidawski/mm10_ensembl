@@ -25,5 +25,6 @@ python generate_results.py
 echo "Removing .dat.gz files..."
 
 rm *.dat.gz
+rm *.chromosome_*.txt
 
 echo "Done"
